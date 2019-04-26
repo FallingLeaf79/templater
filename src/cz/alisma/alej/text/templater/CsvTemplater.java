@@ -24,6 +24,60 @@
 
 package cz.alisma.alej.text.templater;
 
-public class CsvTemplater {
+import java.util.Scanner;
+import java.util.Map;
+import java.util.HashMap;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class CsvTemplater {
+    public static void main(String[] args) throws IOException {
+        String outputFileName = "templater-out-%05d.txt";
+        Scanner csvScanner = null;
+        Scanner templateScanner = null;
+
+        for (String str : args) {
+            String[] splitArg = str.split("=");
+            switch (splitArg[0]) {
+                case "--csv":
+                    csvScanner = new Scanner(new File(splitArg[1]));
+                    csvScanner.useDelimiter(",");
+                    break;
+                case "--template":
+                    templateScanner = new Scanner(new File(splitArg[1]));
+                    break;
+                case "--out":
+                    outputFileName = splitArg[1];
+                    break;
+                default:
+                throw new IllegalArgumentException(
+                    "Invalid argument! Possible arguments:\n--csv=[CSV filepath]\n--template=[template filepath]\n--out=[output filepath]"
+                );
+            }
+        }
+
+        boolean firstLine = true;
+        String[] templateKeys = null;
+        int outputFileNum = 1;
+
+        while (csvScanner.hasNext()) {
+            if (firstLine) {
+                firstLine = false;
+                templateKeys = csvScanner.nextLine().split(",");
+            } else {
+                Map<String, String> templates = new HashMap<String, String>();
+                for (String key : templateKeys) {
+                    templates.put(key, csvScanner.next());
+                }
+
+                PrintWriter output = new PrintWriter(
+                    String.format(outputFileName, outputFileNum)
+                );
+                outputFileNum++;
+                output.print(TemplateFiller.fill(templateScanner, templates));
+            }
+        }
+    }
 }

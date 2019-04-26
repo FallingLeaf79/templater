@@ -26,22 +26,21 @@ package cz.alisma.alej.text.templater;
 
 import java.util.Scanner;
 import java.util.Map;
-import java.util.HashMap;
 
-public class ConsoleTemplater {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Map<String, String> templates = new HashMap<String, String>();
+public class TemplateFiller {
+    public static String fill(Scanner sc, Map<String, String> templates) {
+        StringBuilder result = new StringBuilder();
 
-        for (String str : args) {
-            if (!str.startsWith("--var")) {
-                continue;
+        while (sc.hasNext()) {
+            String next = sc.next();
+            if (!next.equals("{{")) {
+                result.append(next);
             } else {
-                String[] splitArg = str.split("=");
-                templates.put(splitArg[1], splitArg[2]); //splitArg[0]=="--var"
+                String key = sc.next();
+                result.append(templates.get(key));
+                next = sc.next();
             }
         }
-        System.out.println(TemplateFiller.fill(sc, templates));
+        return result.toString();
     }
-
 }
