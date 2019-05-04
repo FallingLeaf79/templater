@@ -27,13 +27,17 @@ package cz.alisma.alej.text.templater;
 import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class CsvTemplater {
     public static void main(String[] args) throws IOException {
+        List<String> template = new ArrayList<String>();
         String outputFileName = "templater-out-%05d.txt";
         Scanner csvScanner = null;
         Scanner templateScanner = null;
@@ -47,6 +51,9 @@ public class CsvTemplater {
                     break;
                 case "--template":
                     templateScanner = new Scanner(new File(splitArg[1]));
+                    while (templateScanner.hasNextLine()) {
+                        template.add(templateScanner.nextLine());
+                    }
                     break;
                 case "--out":
                     outputFileName = splitArg[1];
@@ -67,16 +74,17 @@ public class CsvTemplater {
                 firstLine = false;
                 templateKeys = csvScanner.nextLine().split(",");
             } else {
-                Map<String, String> templates = new HashMap<String, String>();
+                Map<String, String> keys = new HashMap<String, String>();
                 for (String key : templateKeys) {
-                    templates.put(key, csvScanner.next());
+                    keys.put(key, csvScanner.next());
                 }
 
-                PrintWriter output = new PrintWriter(
+                OutputStream output = new FileOutputStream(
                     String.format(outputFileName, outputFileNum)
                 );
                 outputFileNum++;
-                output.print(TemplateFiller.fill(templateScanner, templates));
+                output.write(TemplateFiller.fill(template, keys).getBytes());
+                output.close();
             }
         }
     }

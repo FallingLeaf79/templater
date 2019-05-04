@@ -26,34 +26,24 @@ package cz.alisma.alej.text.templater;
 
 import java.util.Scanner;
 import java.util.Map;
+import java.util.List;
 
 public class TemplateFiller {
-    public static String fill(Scanner sc, Map<String, String> templates) {
+    public static String fill(List<String> template, Map<String, String> keys) {
         StringBuilder result = new StringBuilder();
-        while (sc.hasNextLine()) {
-            String nextLine = sc.nextLine();
-            if(nextLine.isBlank()) {
-                result.append("\n");
-                continue;
+
+        for(String str : template) {
+            StringBuilder line = new StringBuilder(str);
+            for (
+                int startIndex = line.indexOf("{{");
+                startIndex != -1;
+                startIndex = line.indexOf("{{", startIndex + 5)
+            ) {
+                int endIndex = line.indexOf("}}", startIndex) + 2;
+                String key = line.substring(startIndex + 3, endIndex - 3);
+                line.replace(startIndex, endIndex, keys.get(key));
             }
-            Scanner lineScanner = new Scanner(nextLine);
-            boolean first = true;
-            while (lineScanner.hasNext()) {
-                String next = lineScanner.next();
-                if(!first) {
-                    result.append(" ");
-                } else {
-                    first = false;
-                }
-                if (!next.contains("{{")) {
-                result.append(next);
-                } else {
-                    String key = lineScanner.next();
-                    result.append(templates.get(key));
-                    next = lineScanner.next();
-                }
-            }
-            lineScanner.close();
+            result.append(line);
             result.append("\n");
         }
         return result.toString();

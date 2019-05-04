@@ -27,21 +27,27 @@ package cz.alisma.alej.text.templater;
 import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ConsoleTemplater {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Map<String, String> templates = new HashMap<String, String>();
+        Map<String, String> keys = new HashMap<String, String>();
+        List<String> template = new ArrayList<String>();
 
         for (String str : args) {
             if (!str.startsWith("--var")) {
                 continue;
             } else {
                 String[] splitArg = str.split("=");
-                templates.put(splitArg[1], splitArg[2]); //splitArg[0]=="--var"
+                keys.put(splitArg[1], splitArg[2]); //splitArg[0]=="--var"
             }
         }
-        System.out.println(TemplateFiller.fill(sc, templates));
+        while (sc.hasNextLine()) {
+            template.add(sc.nextLine());
+        }
+        System.out.println(TemplateFiller.fill(template, keys));
     }
 
 }
