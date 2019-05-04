@@ -77,8 +77,8 @@ public class TemplateFillerTest {
          });
      }
 
-     private List<String> input;
-     private Map<String, String> keys;
+     private List<String> input = new ArrayList<String>();
+     private Map<String, String> keys = new HashMap<String, String>();
      private String expected;
 
      public TemplateFillerTest(
@@ -94,6 +94,6 @@ public class TemplateFillerTest {
 
      @Test
      public void test() {
-         assertEquals(expected, TemplateFiller.fill(input, keys));
+         assertEquals(expected + "\n", TemplateFiller.fill(input, keys));
      }
  }
