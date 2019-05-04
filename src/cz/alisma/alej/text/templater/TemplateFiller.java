@@ -30,16 +30,31 @@ import java.util.Map;
 public class TemplateFiller {
     public static String fill(Scanner sc, Map<String, String> templates) {
         StringBuilder result = new StringBuilder();
-
-        while (sc.hasNext()) {
-            String next = sc.next();
-            if (!next.equals("{{")) {
-                result.append(next);
-            } else {
-                String key = sc.next();
-                result.append(templates.get(key));
-                next = sc.next();
+        while (sc.hasNextLine()) {
+            String nextLine = sc.nextLine();
+            if(nextLine.isBlank()) {
+                result.append("\n");
+                continue;
             }
+            Scanner lineScanner = new Scanner(nextLine);
+            boolean first = true;
+            while (lineScanner.hasNext()) {
+                String next = lineScanner.next();
+                if(!first) {
+                    result.append(" ");
+                } else {
+                    first = false;
+                }
+                if (!next.contains("{{")) {
+                result.append(next);
+                } else {
+                    String key = lineScanner.next();
+                    result.append(templates.get(key));
+                    next = lineScanner.next();
+                }
+            }
+            lineScanner.close();
+            result.append("\n");
         }
         return result.toString();
     }
