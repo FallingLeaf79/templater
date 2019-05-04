@@ -24,6 +24,68 @@
 
 package cz.alisma.alej.text.templater;
 
-public class CsvTemplater {
+import java.util.Scanner;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
+public class CsvTemplater {
+    public static void main(String[] args) throws IOException {
+        List<String> template = new ArrayList<String>();
+        String outputFileName = "templater-out-%05d.txt";
+        Scanner csvScanner = null;
+        Scanner templateScanner = null;
+
+        for (String str : args) {
+            String[] splitArg = str.split("=");
+            switch (splitArg[0]) {
+                case "--csv":
+                    csvScanner = new Scanner(new File(splitArg[1]));
+                    csvScanner.useDelimiter(",|\n");
+                    break;
+                case "--template":
+                    templateScanner = new Scanner(new File(splitArg[1]));
+                    while (templateScanner.hasNextLine()) {
+                        template.add(templateScanner.nextLine());
+                    }
+                    break;
+                case "--out":
+                    outputFileName = splitArg[1];
+                    break;
+                default:
+                throw new IllegalArgumentException(
+                    "Invalid argument! Possible arguments:\n--csv=[CSV filepath]\n--template=[template filepath]\n--out=[output filepath]"
+                );
+            }
+        }
+
+        boolean firstLine = true;
+        String[] templateKeys = null;
+        int outputFileNum = 1;
+
+        while (csvScanner.hasNext()) {
+            if (firstLine) {
+                firstLine = false;
+                templateKeys = csvScanner.nextLine().split(",");
+            } else {
+                Map<String, String> keys = new HashMap<String, String>();
+                for (String key : templateKeys) {
+                    keys.put(key, csvScanner.next());
+                }
+
+                OutputStream output = new FileOutputStream(
+                    String.format(outputFileName, outputFileNum)
+                );
+                outputFileNum++;
+                output.write(TemplateFiller.fill(template, keys).getBytes());
+                output.close();
+            }
+        }
+    }
 }
