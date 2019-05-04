@@ -43,7 +43,7 @@ public class CsvTemplater {
             switch (splitArg[0]) {
                 case "--csv":
                     csvScanner = new Scanner(new File(splitArg[1]));
-                    csvScanner.useDelimiter(",");
+                    csvScanner.useDelimiter(",|\n");
                     break;
                 case "--template":
                     templateScanner = new Scanner(new File(splitArg[1]));
