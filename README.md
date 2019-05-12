@@ -1,2 +1,2 @@
-# templater
-Semestral Work 2 Part II: The Tale of Templates
+# Templater
+Fills in text templates.
